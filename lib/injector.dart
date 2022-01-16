@@ -1,5 +1,5 @@
-typedef T InstanceFactory<T extends dynamic>(Getter getter);
-typedef T InstanceFactoryWithParams<T extends dynamic>(Getter getter, Map<String, dynamic> params);
+typedef InstanceFactory<T extends dynamic> = T Function(Getter getter);
+typedef InstanceFactoryWithParams<T extends dynamic> = T Function(Getter getter, Map<String, dynamic> params);
 
 abstract class InstanceWrapper<T extends dynamic> {
   InstanceFactoryWithParams<T> _factory;
@@ -35,8 +35,8 @@ abstract class Getter {
 }
 
 class Injector implements Getter {
-  static Injector _root = Injector._();
-  static Map<String, Injector> _injectorsRegistry = {};
+  static final Injector _root = Injector._();
+  static final Map<String, Injector> _injectorsRegistry = {};
 
   Injector? _parentInjector;
   Map<String, InstanceWrapper> instanceWrappers = {};
@@ -76,11 +76,11 @@ class Injector implements Getter {
   void map<T extends dynamic>(InstanceFactory instanceFactory, {isSingleton = true, String key = ""}) {
     String genKey = _generateKey<T>(key);
     InstanceFactoryWithParams<T> factory = (i, _) => instanceFactory(i);
-    this.instanceWrappers[genKey] = isSingleton ? new Singleton(factory) : new Prototype(factory);
+    instanceWrappers[genKey] = isSingleton ? Singleton(factory) : Prototype(factory);
   }
 
   void mapWithParams<T extends dynamic>(InstanceFactoryWithParams instanceFactory, {String key = ""}) {
     String genKey = _generateKey<T>(key);
-    this.instanceWrappers[genKey] = new Prototype(instanceFactory);
+    instanceWrappers[genKey] = Prototype(instanceFactory);
   }
 }

@@ -1,6 +1,6 @@
 import 'package:flutter_test/flutter_test.dart';
+import 'package:injector/injector.dart';
 
-import '../lib/common/helpers/injector.dart';
 
 abstract class IX {
   int getValue();
@@ -76,8 +76,8 @@ void main() {
     expect(ir.get<IX>().getValue(), 100);
   });
 
-  /* with params */
-  test('root with params', () {
+  /* with key */
+  test('root with key', () {
     final Injector ir = Injector.root();
     int x = 0;
     int y = 0;
@@ -92,7 +92,7 @@ void main() {
     expect(() => ir.get<IY>(key: "unknown_key"), throwsAssertionError);
   });
 
-  test('child with params', () {
+  test('child with key', () {
     final Injector ic = Injector.root().child();
     int x = 0;
     int y = 0;
@@ -107,7 +107,7 @@ void main() {
     expect(() => ic.get<IY>(key: "unknown_key"), throwsAssertionError);
   });
 
-  test('root & child with params', () {
+  test('root & child with key', () {
     final Injector ir = Injector.root();
     ir.map<IX>((i) => X(100), key: "key");
     ir.map<IY>((i) => Y(i.get<IX>(key: "key"), 100), isSingleton: false, key: "key");
@@ -120,5 +120,12 @@ void main() {
     expect(ir.get<IX>(key: "key").getValue(), 100);
     expect(() => ic.get<IX>(key: "unknown_key"), throwsAssertionError);
     expect(() => ic.get<IY>(key: "unknown_key"), throwsAssertionError);
+  });
+
+  /* params */
+  test('root with params', () {
+    final Injector ir = Injector.root();
+    ir.mapWithParams<IX>((i, params) => X(params["intValue"] as int), key: "key_with_params");
+    expect(ir.get<IX>(key: "key_with_params", params: {"intValue": 200}).getValue(), 200);
   });
 }
