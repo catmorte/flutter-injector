@@ -83,4 +83,9 @@ class Injector implements Getter {
     String genKey = _generateKey<T>(key);
     instanceWrappers[genKey] = Prototype(instanceFactory);
   }
+   
+  void dispose() {
+    this.instanceWrappers.clear();
+    this._parentInjector = null;
+  }
 }
